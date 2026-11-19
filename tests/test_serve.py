@@ -87,3 +87,31 @@ def test_unknown_paths_are_404(server):
     with pytest.raises(urllib.error.HTTPError) as error:
         urllib.request.urlopen(_url(srv, "/nope"))
     assert error.value.code == 404
+
+
+def test_error_page_is_escaped(tmp_path: Path, monkeypatch):
+    out = tmp_path / "missing.html"
+
+    def boom(*_args, **_kwargs):
+        raise RuntimeError("<script>alert(1)</script>")
+
+    monkeypatch.setattr(serve.refresh_mod, "generate", boom)
+    srv = serve.make_server(port=0, out=out)
+    thread = threading.Thread(target=srv.serve_forever, daemon=True)
+    thread.start()
+    try:
+        with pytest.raises(urllib.error.HTTPError) as error:
+            urllib.request.urlopen(_url(srv))
+        assert error.value.code == 503
+        body = error.value.read().decode()
+        assert "<script>alert(1)</script>" not in body
+        assert "&lt;script&gt;" in body
+    finally:
+        srv.shutdown()
+        srv.server_close()
+        thread.join(timeout=5)
+
+
+def test_no_host_option_can_expose_the_endpoint():
+    with pytest.raises(TypeError):
+        serve.make_server(port=0, host="0.0.0.0")

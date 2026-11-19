@@ -43,7 +43,6 @@ def build_parser() -> argparse.ArgumentParser:
     srv = sub.add_parser("serve", help="serve the dashboard locally, with a working Refresh button")
     _add_source_args(srv)
     srv.add_argument("--port", type=int, default=DEFAULT_PORT, help=f"port (default {DEFAULT_PORT})")
-    srv.add_argument("--host", default="127.0.0.1", help="bind address (loopback by default)")
     srv.add_argument("--verbose", action="store_true", help="log every request")
     return parser
 
@@ -54,7 +53,6 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "serve":
         return serve_mod.serve(
             port=args.port,
-            host=args.host,
             out=Path(args.out),
             home=args.home,
             cache=args.cache,

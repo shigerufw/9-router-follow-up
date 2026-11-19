@@ -6,6 +6,7 @@ parameters: ``POST /refresh`` re-runs the same in-process generator the CLI uses
 
 from __future__ import annotations
 
+import html
 import json
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -14,11 +15,12 @@ from urllib.parse import urlparse
 
 from . import refresh as refresh_mod
 
+LOOPBACK = "127.0.0.1"
+
 
 def make_server(
     *,
     port: int = 4780,
-    host: str = "127.0.0.1",
     out: Path | str = refresh_mod.DEFAULT_OUT,
     home: Path | str | None = None,
     cache: Path | str | None = None,
@@ -70,9 +72,10 @@ def make_server(
                 if out.exists():
                     self._send(HTTPStatus.OK, out.read_bytes(), "text/html; charset=utf-8")
                 else:
+                    message = html.escape(str(state["error"] or "unknown error"))
                     self._send(
                         HTTPStatus.SERVICE_UNAVAILABLE,
-                        f"<h1>No report yet</h1><p>{state['error']}</p>".encode(),
+                        f"<h1>No report yet</h1><p>{message}</p>".encode(),
                         "text/html; charset=utf-8",
                     )
                 return
@@ -108,13 +111,12 @@ def make_server(
                 },
             )
 
-    return ThreadingHTTPServer((host, port), Handler)
+    return ThreadingHTTPServer((LOOPBACK, port), Handler)
 
 
 def serve(
     *,
     port: int = 4780,
-    host: str = "127.0.0.1",
     out: Path | str = refresh_mod.DEFAULT_OUT,
     home: Path | str | None = None,
     cache: Path | str | None = None,
@@ -135,7 +137,6 @@ def serve(
 
     server = make_server(
         port=port,
-        host=host,
         out=out,
         home=home,
         cache=cache,
@@ -143,7 +144,7 @@ def serve(
         force_fetch=force_fetch,
         verbose=verbose,
     )
-    print(f"serving on http://{host}:{server.server_port}/  (Ctrl+C to stop)")
+    print(f"serving on http://{LOOPBACK}:{server.server_port}/  (Ctrl+C to stop)")
     try:
         server.serve_forever()
     except KeyboardInterrupt:
