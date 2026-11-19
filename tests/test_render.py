@@ -68,6 +68,25 @@ def test_refresh_button_explains_static_mode(local_home: Path, or_models: dict):
     assert 'fetch("/refresh"' in html
 
 
+def test_combo_column_lists_combo_membership(local_home: Path, or_models: dict):
+    html = _html(local_home, or_models)
+    # the column exists and renders one tag per combo
+    assert '{ key: "combo", label: "Combo" }' in html
+    assert 'wrap.appendChild(el("span", "tag combo", name))' in html
+    # combo names participate in the text filter
+    assert '(r.in_combos || []).join(" ")' in html
+
+    import json
+    import re
+
+    match = re.search(r'<script id="data" type="application/json">(.*?)</script>', html, re.S)
+    payload = json.loads(match.group(1).replace("<\\/", "</"))
+    rows = {(row["provider"], row["model"]): row for row in payload["models"]}
+    assert rows[("opencode", "deepseek-v4.1-flash-free")]["in_combos"] == ["t-combo"]
+    assert rows[("nvidia", "nvidia/nemotron-3.5-lightning-30b-a3b")]["in_combos"] == ["t-combo"]
+    assert rows[("openrouter", "cohere/north-mini-code:free")]["in_combos"] == []
+
+
 def test_payload_is_valid_json(local_home: Path, or_models: dict):
     import json
     import re
