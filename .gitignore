@@ -1,0 +1,15 @@
+# --- MSF (Mini Software Factory): local tooling, not product code ---
+.msf/
+.claude/settings.json
+.claude/agents/msf-*.md
+.claude/skills/msf/
+AGENTS.md
+# --- end MSF ---
+
+# local Python tooling
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+.DS_Store
