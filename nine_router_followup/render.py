@@ -108,6 +108,8 @@ td.num,th.num{text-align:right}
 .tag.on{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 45%,transparent)}
 .tag.off{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 40%,transparent)}
 .tag.warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 45%,transparent)}
+.tag.combo{color:var(--acc);border-color:color-mix(in srgb,var(--acc) 45%,transparent)}
+.tags{display:inline-flex;gap:4px;flex-wrap:wrap}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
 .grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px}
 .box{border:1px solid var(--line);border-radius:8px;padding:10px}
@@ -132,7 +134,7 @@ footer{padding:0 20px 24px;color:var(--mut);font-size:11.5px}
   <section class="panel">
     <h2>Models</h2>
     <div class="toolbar">
-      <input type="search" id="q" placeholder="Filter by model, provider or OpenRouter name…" autocomplete="off">
+      <input type="search" id="q" placeholder="Filter by model, provider, combo or OpenRouter name…" autocomplete="off">
       <select id="provider"><option value="">all providers</option></select>
       <label class="chk"><input type="checkbox" id="inuse"> only models in use</label>
       <span class="mut" id="count"></span>
@@ -234,6 +236,7 @@ footer{padding:0 20px 24px;color:var(--mut);font-size:11.5px}
   var COLS = [
     { key: "provider", label: "Provider" },
     { key: "model", label: "Model" },
+    { key: "combo", label: "Combo" },
     { key: "requests", label: "Req", num: true },
     { key: "prompt_tokens", label: "In tok", num: true },
     { key: "completion_tokens", label: "Out tok", num: true },
@@ -277,6 +280,13 @@ footer{padding:0 20px 24px;color:var(--mut);font-size:11.5px}
       if (bits.length) wrap.title = bits.join(" · ");
       return wrap;
     },
+    combo: function (r) {
+      var names = r.in_combos || [];
+      if (!names.length) return "—";
+      var wrap = el("span", "tags");
+      names.forEach(function (name) { wrap.appendChild(el("span", "tag combo", name)); });
+      return wrap;
+    },
     requests: function (r) { return r.requests ? fmt(r.requests) : "—"; },
     prompt_tokens: function (r) { return r.prompt_tokens ? compact(r.prompt_tokens) : "—"; },
     completion_tokens: function (r) { return r.completion_tokens ? compact(r.completion_tokens) : "—"; },
@@ -309,7 +319,8 @@ footer{padding:0 20px 24px;color:var(--mut);font-size:11.5px}
       if (provider && r.provider !== provider) return false;
       if (onlyUsed && !r.in_use) return false;
       if (!q) return true;
-      return (r.provider + " " + r.model + " " + (r.or_name || "") + " " + (r.or_id || ""))
+      return (r.provider + " " + r.model + " " + (r.or_name || "") + " " + (r.or_id || "") +
+        " " + (r.in_combos || []).join(" "))
         .toLowerCase().indexOf(q) !== -1;
     });
   }
@@ -317,6 +328,7 @@ footer{padding:0 20px 24px;color:var(--mut);font-size:11.5px}
   function value(r, key) {
     var v = r[key];
     if (v === null || v === undefined) return "";
+    if (Array.isArray(v)) return v.join(", ");
     return v;
   }
 

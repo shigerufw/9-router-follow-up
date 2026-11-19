@@ -45,8 +45,9 @@ install/change/uninstall steps. Agents can drive all of it with
 - **Summary**: models known, in use, requests, tokens in/out, cost, provider connections,
   combos, and how many models have an OpenRouter counterpart.
 - **Models**: every model 9router can route to — used, hand-added (custom models), or offered
-  by a connected provider — with usage (requests, tokens, cost, errors, last used), context
-  window, max output, OpenRouter prices per 1M tokens, vision/modality and enabled state.
+  by a connected provider — with the combo(s) it belongs to (searchable by combo name), usage
+  (requests, tokens, cost, errors, last used), context window, max output, OpenRouter prices
+  per 1M tokens, vision/modality and enabled state.
 - **Providers & connections**: connection name, auth type, priority and active state.
 - **Combos**: each member with `available` / `missing` and whether it is in use.
 - **Not matched in OpenRouter**: listed explicitly instead of being guessed.
