@@ -16,3 +16,8 @@ __pycache__/
 dist/
 
 .DS_Store
+
+.msf/board.json
+.msf/.lock
+.msf/.active-role
+.msf/jobs/*/trace.jsonl
