@@ -126,30 +126,35 @@ def read_usage(conn: sqlite3.Connection) -> list[Usage]:
         "from usageHistory group by provider, model",
         tuple(sorted(OK_STATUSES)),
     ).fetchall()
-    return [
-        Usage(
-            provider=normalize_provider(provider),
-            model=model,
-            requests=requests,
-            prompt_tokens=int(prompt_tokens),
-            completion_tokens=int(completion_tokens),
-            cost=float(cost),
-            errors=int(errors),
-            first_seen=first_seen,
-            last_seen=last_seen,
+    usage: list[Usage] = []
+    for (
+        provider,
+        model,
+        requests,
+        prompt_tokens,
+        completion_tokens,
+        cost,
+        errors,
+        first_seen,
+        last_seen,
+    ) in rows:
+        # A malformed row must not become a phantom model named "None".
+        if not (provider or "").strip() or not (model or "").strip():
+            continue
+        usage.append(
+            Usage(
+                provider=normalize_provider(provider),
+                model=model.strip(),
+                requests=requests,
+                prompt_tokens=int(prompt_tokens),
+                completion_tokens=int(completion_tokens),
+                cost=float(cost),
+                errors=int(errors),
+                first_seen=first_seen,
+                last_seen=last_seen,
+            )
         )
-        for (
-            provider,
-            model,
-            requests,
-            prompt_tokens,
-            completion_tokens,
-            cost,
-            errors,
-            first_seen,
-            last_seen,
-        ) in rows
-    ]
+    return usage
 
 
 def read_combos(conn: sqlite3.Connection) -> list[Combo]:

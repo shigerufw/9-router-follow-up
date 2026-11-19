@@ -153,13 +153,14 @@ def match_openrouter(provider: str, model: str, index: dict[str, dict]) -> tuple
         if candidate in index:
             return candidate, "provider"
 
-    target = _strip_variant(_tail(model))
+    tail = _tail(model)
+    target = _strip_variant(tail)
 
     # same tail, different organisation prefix (meta/ vs meta-llama/) or variant
     hits = [mid for mid in index if _strip_variant(_tail(mid)) == target]
     picked = _pick(hits, index)
     if picked:
-        return picked, "variant" if target != model else "tail"
+        return picked, "variant" if target != tail else "tail"
     if len(hits) > 1:
         return None, "ambiguous"
 

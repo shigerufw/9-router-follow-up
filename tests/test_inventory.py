@@ -88,6 +88,13 @@ def test_tail_match_and_unmatched(local_home: Path, or_models: dict):
     assert unknown in inv.unmatched
 
 
+def test_tail_match_is_not_labelled_variant():
+    index = {"meta-llama/llama-guard-4-12b": {}}
+    or_id, kind = inventory.match_openrouter("nvidia", "meta/llama-guard-4-12b", index)
+    assert or_id == "meta-llama/llama-guard-4-12b"
+    assert kind == "tail"
+
+
 def test_size_tag_fuzzy_match():
     index = {"nvidia/nemotron-3.5-lightning": {}, "nvidia/nemotron-3.5-lightning:free": {}}
     or_id, kind = inventory.match_openrouter(

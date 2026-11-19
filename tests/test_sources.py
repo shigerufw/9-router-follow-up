@@ -38,6 +38,15 @@ def test_opencode_alias_is_normalized(local_home: Path):
     assert {u.provider for u in snap.usage} == {"opencode", "nvidia", "openrouter"}
 
 
+def test_malformed_usage_rows_are_dropped(local_home: Path):
+    snap = sources.load_local(local_home)
+    assert len(snap.usage) == 4
+    for usage in snap.usage:
+        assert usage.provider.strip()
+        assert usage.model.strip()
+        assert usage.model not in {"None", "  "}
+
+
 def test_catalog_is_loaded(local_home: Path):
     snap = sources.load_local(local_home)
     assert "nvidia" in snap.catalog["providers"]

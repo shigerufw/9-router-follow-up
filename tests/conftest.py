@@ -87,6 +87,8 @@ USAGE = [
     ("2026-11-19T00:00:00Z", "nvidia", "nvidia/nemotron-3.5-lightning-30b-a3b", 100, 50, 0.0, "ok"),
     ("2026-11-19T01:00:00Z", "openrouter", "cohere/north-mini-code:free", 1, 2, 0.0, "ok"),
     ("2026-11-19T02:00:00Z", "nvidia", "llama-guard-4-12b", 5, 6, 0.0, "ok"),
+    ("2026-11-19T03:00:00Z", None, None, 1, 1, 0.0, "ok"),
+    ("2026-11-19T04:00:00Z", "  ", "  ", 1, 1, 0.0, "ok"),
 ]
 
 
