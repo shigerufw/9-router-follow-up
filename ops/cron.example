@@ -1,0 +1,13 @@
+# Cron example — not installed. See docs/REFRESH.md.
+#
+# Fields: minute hour day-of-month month day-of-week   command
+# Replace /path/to/9-router-follow-up with this repo's absolute path.
+#
+# every 6 hours, on the hour
+0 */6 * * *   /path/to/9-router-follow-up/ops/refresh.sh
+#
+# daily at 08:05
+# 5 8 * * *   /path/to/9-router-follow-up/ops/refresh.sh
+#
+# hourly, offline only (no OpenRouter fetch, cache may be stale)
+# 0 * * * *   env REFRESH_ARGS="--offline" /path/to/9-router-follow-up/ops/refresh.sh

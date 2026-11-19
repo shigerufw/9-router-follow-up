@@ -24,6 +24,21 @@ Options:
 | `--offline` | never hit the network; use the cache (may be stale) |
 | `--refresh` | force a fetch even when the cache is fresh (TTL 24h) |
 | `--generated ISO` | fixed timestamp, for reproducible output |
+| `--skip-if-busy` | exit 0 if another refresh is running (used by schedulers) |
+
+### Keeping it up to date
+
+`dist/models.html` is a snapshot; every run re-reads 9router and rewrites it.
+
+```bash
+python3 -m nine_router_followup dashboard --refresh   # one-shot
+python3 -m nine_router_followup serve                 # http://127.0.0.1:4780/ + Refresh button
+```
+
+Scheduling is **prepared but not installed**: `ops/refresh.sh` is the cron/launchd entry
+point, templates live in `ops/launchd/` and `ops/cron.example`, and `docs/REFRESH.md` has the
+install/change/uninstall steps. Agents can drive all of it with
+`skills/9router-refresh/SKILL.md`.
 
 ### What it shows
 

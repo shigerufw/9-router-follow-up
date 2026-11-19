@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  TEMPLATE — not installed. docs/REFRESH.md explains how to render it:
+    sed "s|__REPO__|$PWD|g" ops/launchd/com.9routerfollowup.refresh.plist.template \
+      > ~/Library/LaunchAgents/com.9routerfollowup.refresh.plist
+
+  Cadence: StartInterval is in seconds. 21600 = every 6 hours.
+  Change it here (900 = 15 min, 3600 = hourly, 86400 = daily).
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.9routerfollowup.refresh</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>__REPO__/ops/refresh.sh</string>
+  </array>
+  <key>StartInterval</key>
+  <integer>21600</integer>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>__REPO__/dist/launchd.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>__REPO__/dist/launchd.err.log</string>
+</dict>
+</plist>
