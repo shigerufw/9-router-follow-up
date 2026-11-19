@@ -81,6 +81,11 @@ header{padding:16px 20px 8px;display:flex;flex-wrap:wrap;gap:10px;align-items:ba
 h1{font-size:18px;margin:0}
 h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);margin:0 0 10px}
 .mut{color:var(--mut)}
+.grow{flex:1}
+.btn{background:var(--acc);color:#fff;border:0;border-radius:6px;padding:6px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.55;cursor:default;filter:none}
+.hint{color:var(--mut);font-size:12px;margin:0;padding:0 20px 8px}
 main{padding:0 20px 40px;display:grid;gap:14px}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
@@ -117,7 +122,10 @@ footer{padding:0 20px 24px;color:var(--mut);font-size:11.5px}
 <header>
   <h1>9router model inventory</h1>
   <span class="mut" id="subtitle">__PRODUCT__</span>
+  <span class="grow"></span>
+  <button class="btn" id="refresh" type="button">Refresh</button>
 </header>
+<p class="hint" id="refresh-hint"></p>
 <main>
   <section class="cards" id="cards"></section>
 
@@ -429,6 +437,35 @@ footer{padding:0 20px 24px;color:var(--mut);font-size:11.5px}
   document.getElementById("footer").textContent =
     "Read-only: generated from ~/.9router (catalog + sqlite, no apiKeys) and the public OpenRouter models table.";
   renderTable();
+
+  // ---- refresh
+  var refreshBtn = document.getElementById("refresh");
+  var hint = document.getElementById("refresh-hint");
+  var CLI = "python3 -m nine_router_followup dashboard";
+  var served = location.protocol === "http:" || location.protocol === "https:";
+  if (!served) {
+    refreshBtn.disabled = true;
+    refreshBtn.title = "This file is a snapshot. Run: " + CLI;
+    hint.textContent = "Static snapshot. Refresh with `" + CLI +
+      "`, or run `python3 -m nine_router_followup serve` and use this button there.";
+  } else {
+    hint.textContent = "Served locally: the button regenerates the page from 9router and OpenRouter.";
+    refreshBtn.addEventListener("click", function () {
+      refreshBtn.disabled = true;
+      refreshBtn.textContent = "Refreshing…";
+      fetch("/refresh", { method: "POST" })
+        .then(function (response) {
+          if (!response.ok) throw new Error("HTTP " + response.status);
+          return response.json();
+        })
+        .then(function () { location.reload(); })
+        .catch(function (error) {
+          refreshBtn.disabled = false;
+          refreshBtn.textContent = "Refresh";
+          hint.textContent = "Refresh failed: " + error.message;
+        });
+    });
+  }
 })();
 </script>
 </body>

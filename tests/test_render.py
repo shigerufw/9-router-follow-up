@@ -60,6 +60,14 @@ def test_document_references_the_product(local_home: Path, or_models: dict):
     assert "9router model inventory" in html
 
 
+def test_refresh_button_explains_static_mode(local_home: Path, or_models: dict):
+    html = _html(local_home, or_models)
+    assert 'id="refresh"' in html
+    assert 'id="refresh-hint"' in html
+    assert "python3 -m nine_router_followup dashboard" in html
+    assert 'fetch("/refresh"' in html
+
+
 def test_payload_is_valid_json(local_home: Path, or_models: dict):
     import json
     import re
